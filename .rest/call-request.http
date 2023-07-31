@@ -1,0 +1,24 @@
+
+POST http://localhost:8080/api/pdf/create HTTP/1.1
+content-type: application/json
+
+[
+    {
+        "name": "Manisha",
+        "country": "India"
+    }
+]
+
+###
+
+POST http://localhost:8080/api/pdf/download HTTP/1.1
+content-type: application/json
+
+[
+    {
+        "name": "Manisha",
+        "country": "India"
+    }
+]
+
+###
