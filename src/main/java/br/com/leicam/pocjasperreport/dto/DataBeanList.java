@@ -1,5 +1,11 @@
 package br.com.leicam.pocjasperreport.dto;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class DataBeanList {
@@ -24,5 +30,15 @@ public class DataBeanList {
       dataBean.setCountry(country);
       
       return dataBean;
+   }
+
+   public HtmlBean getHtml(String htmlFileName) throws IOException {
+      var htmlBean = new HtmlBean();
+
+      Path path = Paths.get(htmlFileName);
+
+
+      htmlBean.setHtmlCode(Files.readAllLines(path).get(0));
+      return htmlBean;
    }
 }

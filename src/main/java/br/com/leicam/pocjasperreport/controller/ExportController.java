@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.leicam.pocjasperreport.dto.DataBean;
 import br.com.leicam.pocjasperreport.dto.DataBeanList;
+import br.com.leicam.pocjasperreport.dto.HtmlBean;
 import br.com.leicam.pocjasperreport.service.ReportGenerate;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,14 +34,17 @@ public class ExportController {
     }
 
     @PostMapping("/create")
-    public void create(@RequestBody List<DataBean> data) {
+    public void create(@RequestBody List<DataBean> data) throws IOException {
         Map<String, Object> parameters = new HashMap<>();
         
 
-        var templateFileName = "src/main/resources/templates/report.jrxml";
-        var exportFileName = "export/report.pdf";
+        var templateFileName = "src/main/resources/templates/html-template-model.jrxml";
+        var exportFileName = "export/html-template-model.pdf";
 
-        service.toPdf(templateFileName, exportFileName, parameters, data);
+        List<HtmlBean> list = new ArrayList<>();
+        list.add(new DataBeanList().getHtml("/Users/genario/Documents/_Jeova/quadro/Quadro/NVMC-12-2020.html"));
+
+        service.toPdf(templateFileName, exportFileName, parameters, list);
 
 
 
