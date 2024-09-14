@@ -1,28 +1,24 @@
 package br.com.leicam.pocjasperreport.controller;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.leicam.pocjasperreport.dto.DataBean;
-import br.com.leicam.pocjasperreport.dto.DataBeanList;
-import br.com.leicam.pocjasperreport.dto.HtmlBean;
+import br.com.leicam.model.Bairro;
+import br.com.leicam.model.DataBean;
 import br.com.leicam.pocjasperreport.service.ReportGenerate;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
-import net.sf.jasperreports.engine.JasperExportManager;
 
 @RestController
 @RequestMapping("/api/pdf")
@@ -33,20 +29,16 @@ public class ExportController {
         this.service = service;
     }
 
-    @PostMapping("/create")
-    public void create(@RequestBody List<DataBean> data) throws IOException {
+    @GetMapping("/compile/{jrxmlFileName}")
+    public void compile(@PathVariable String jrxmlFileName) {
+        service.toCompileFile(jrxmlFileName.replace("_","/"));
+    }
+
+    @PostMapping("/create/{jasperFileName}/{pdfFileName}")
+    public void create(@PathVariable String jasperFileName, @PathVariable String pdfFileName, @RequestBody List<DataBean> data) throws IOException {
         Map<String, Object> parameters = new HashMap<>();
         
-
-        var templateFileName = "src/main/resources/templates/html-template-model.jrxml";
-        var exportFileName = "export/html-template-model.pdf";
-
-        List<HtmlBean> list = new ArrayList<>();
-        list.add(new DataBeanList().getHtml("/Users/genario/Documents/_Jeova/quadro/Quadro/NVMC-12-2020.html"));
-
-        service.toPdf(templateFileName, exportFileName, parameters, list);
-
-
+        service.toPdf(jasperFileName.replace("_","/"), pdfFileName.replace("_","/"), parameters, data);
 
     }
 
@@ -55,9 +47,9 @@ public class ExportController {
     public void download(HttpServletResponse response)  throws IOException{
         Map<String, Object> parameters = new HashMap<>();
 
-        var templateFileName = "src/main/resources/templates/report.jrxml";
-        var exportFileName = "export/report.pdf";
-        var list = new DataBeanList().getDataBeanList();
+        var templateFileName = "src/main/resources/templates/list-template-model.jrxml";
+        var exportFileName = "export/list-template-model.pdf";
+        var list = new ArrayList<DataBean>();
         ServletOutputStream servletOutputStream = response.getOutputStream();
         service.toStream(templateFileName, exportFileName, parameters, list, servletOutputStream);
         
@@ -69,9 +61,16 @@ public class ExportController {
 
     @GetMapping
     public ResponseEntity<?> get() {
-        var list = new DataBeanList().getDataBeanList();
+        return ResponseEntity.ok().body(getDataBeans());
+    }
 
-        return ResponseEntity.ok().body(list);
+    private List<DataBean> getDataBeans() {
+        var bairros = new ArrayList<Bairro>();
+        bairros.add(new Bairro("Vila Curuca"));
+        
+        var list = new ArrayList<DataBean>();
+        list.add(new DataBean("Brasil", "Santo André", bairros));
+        return list;
     }
     
 }

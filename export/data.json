@@ -1,15 +1,3 @@
-@template=src_main_resources_templates_list-template-model
-@jasperFileName=src_main_resources_templates_list-template-model.jasper
-@pdfFileName=src_main_resources_templates_list-template-model.pdf
-
-GET http://localhost:8080/api/pdf/compile/{{template}}.jrxml HTTP/1.1
-content-type: application/json
-
-###
-
-POST http://localhost:8080/api/pdf/create/{{jasperFileName}}/{{pdfFileName}} HTTP/1.1
-content-type: application/json
-
 [
     {
         "pais": "India",
@@ -40,10 +28,3 @@ content-type: application/json
         ]
     }
 ]
-
-###
-
-GET http://localhost:8080/api/pdf/download HTTP/1.1
-content-type: application/json
-
-###

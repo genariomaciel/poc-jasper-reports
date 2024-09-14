@@ -1,0 +1,28 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<project name = "JasperReportTest" default = "executereport" basedir = ".">
+   <import file = "baseBuild.xml"/>
+
+   <target name = "executereport" depends = "compile,compilereportdesing,run">
+      <echo message = "Im here"/>
+   </target>
+   
+   <target name = "compilereportdesing" description = "Compiles the JXML file and
+      produces the .jasper file.">
+      
+      <taskdef name = "jrc"
+         classname = "net.sf.jasperreports.ant.JRAntCompileTask">
+         <classpath refid = "classpath" />
+      </taskdef>
+      
+      <jrc destdir = ".">
+         <src>
+            <fileset dir = ".">
+               <include name = "*.jrxml" />
+            </fileset>
+         </src>
+         <classpath refid = "classpath" />
+      </jrc>
+   
+   </target>
+	
+</project>

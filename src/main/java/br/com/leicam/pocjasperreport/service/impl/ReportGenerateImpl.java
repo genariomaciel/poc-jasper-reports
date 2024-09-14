@@ -21,11 +21,11 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 public class ReportGenerateImpl implements ReportGenerate {
 
     @Override
-    public <T> void toPdf(String jrxml, String exportFileName, Map<String, Object> parameters, List<T> data) {
+    public <T> void toPdf(String jasperFileName, String exportFileName, Map<String, Object> parameters, List<T> data) {
         
         String printFileName = null;
         try {
-            JasperPrint jasperPrint = processar(jrxml, exportFileName, parameters, data);
+            JasperPrint jasperPrint = processar(jasperFileName, exportFileName, parameters, data);
             JasperExportManager.exportReportToPdfFile(jasperPrint,  exportFileName);
 
         } catch (Exception e) {
@@ -34,9 +34,9 @@ public class ReportGenerateImpl implements ReportGenerate {
     }
 
     @Override
-    public <T> void toStream(String jrxml, String exportFileName, Map<String, Object> parameters, List<T> data, ServletOutputStream servletOutputStream) {
+    public <T> void toStream(String jasperFileName, String exportFileName, Map<String, Object> parameters, List<T> data, ServletOutputStream servletOutputStream) {
         
-        JasperPrint jasperPrint = processar(jrxml, exportFileName, parameters, data);
+        JasperPrint jasperPrint = processar(jasperFileName, exportFileName, parameters, data);
         try {
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
         } catch (JRException e) {
@@ -46,26 +46,40 @@ public class ReportGenerateImpl implements ReportGenerate {
 
     }
 
-    private <T> JasperPrint processar(String jrxml, String exportFileName, Map<String, Object> parameters, List<T> data) {
+    private <T> JasperPrint processar(String jasperFileName, String exportFileName, Map<String, Object> parameters, List<T> data) {
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(data);
         JasperPrint jasperPrint = null;
         try {
             
-            JasperReport jasperReport = compileReport(jrxml);
-            jasperPrint =  JasperFillManager.fillReport(jasperReport, parameters, beanCollectionDataSource);
+            // jasperPrint =  JasperFillManager.fillReport(jasperReport, parameters, beanCollectionDataSource);
+            jasperPrint =  JasperFillManager.fillReport(jasperFileName, parameters, beanCollectionDataSource);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         if (jasperPrint == null) {
-            throw new RuntimeException("Problema oa gerar o relatorio.");
+            throw new RuntimeException("Problema ao gerar o relatorio.");
         }
         return jasperPrint; 
     }
 
-    private JasperReport  compileReport(String jrxml) throws JRException {
-        return JasperCompileManager.compileReport(jrxml);
+    @Override
+    public JasperReport toCompile(String jrxmlFileName) {
+        JasperReport jasperReport = null;
+        try {
+            jasperReport = JasperCompileManager.compileReport(jrxmlFileName);
+        } catch (JRException e) {
+            System.out.println(e.getMessage());
+        }
+        return jasperReport;
     }
 
-    
+    @Override
+    public void toCompileFile(String jrxmlFileName) {
+        try {
+            JasperCompileManager.compileReportToFile(jrxmlFileName);
+        } catch (JRException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
